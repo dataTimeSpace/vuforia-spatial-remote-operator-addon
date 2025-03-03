@@ -78,26 +78,32 @@ module.exports.start = function start() {
 
         let playback = null;
         ws.on('message', (msgStr, _isBinary) => {
-
             try {
-                const msg = JSON.parse(msgStr);
+                let msg = JSON.parse(msgStr);
+                if (!msg.command) {
+                    msg = JSON.parse(msg.b);
+                }
+                if (!msg) {
+                    console.warn('Message parse failed', msgStr);
+                    return;
+                }
                 switch (msg.command) {
-                case '/update/humanPoses':
-                    doUpdateHumanPoses(msg);
-                    break;
-                case '/update/sensorDescription':
-                    doUpdateSensorDescription(msg);
-                    break;
-                case '/videoRecording/start':
-                    if (videoServer) {
-                        videoServer.startRecording(DEVICE_ID_PREFIX + deviceId);
-                    }
-                    break;
-                case '/videoRecording/stop':
-                    if (videoServer) {
-                        videoServer.stopRecording(DEVICE_ID_PREFIX + deviceId);
-                    }
-                    break;
+                    case '/update/humanPoses':
+                        doUpdateHumanPoses(msg);
+                        break;
+                    case '/update/sensorDescription':
+                        doUpdateSensorDescription(msg);
+                        break;
+                    case '/videoRecording/start':
+                        if (videoServer) {
+                            videoServer.startRecording(DEVICE_ID_PREFIX + deviceId);
+                        }
+                        break;
+                    case '/videoRecording/stop':
+                        if (videoServer) {
+                            videoServer.stopRecording(DEVICE_ID_PREFIX + deviceId);
+                        }
+                        break;
                 }
             } catch (error) {
                 console.warn('Could not parse message: ', error);
@@ -106,6 +112,17 @@ module.exports.start = function start() {
         });
 
         let cleared = false;
+        /**
+         * @param msg
+         * {
+         *   time: number, // Date.now(),
+         *   pose: Array<Pose>,
+         * }
+         * type Pose = {
+         *   id: string,
+         *   joints: Array<Vec3>,
+         * }
+         */
         function doUpdateHumanPoses(msg) {
             if (playback && !playback.running) {
                 playback = null;
