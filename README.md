@@ -6,19 +6,19 @@ Join the conversations in our [discourse forum](https://forum.spatialtoolbox.vuf
 
 # vuforia-spatial-remote-operator-addon
 
-The Remote Operator is an add-on for [Vuforia Spatial Toolbox](https://github.com/ptcrealitylab/vuforia-spatial-toolbox-ios) that makes it compatible with the [Vuforia Spatial Toolbox Virtualizer](https://github.com/ptcrealitylab/vuforia-spatial-toolbox-virtualizer) Unity project. The result is a browser-based web app that combines a live volumetric capture of a space with mixed reality content.
+The Remote Operator is an add-on for [Vuforia Spatial Toolbox](https://github.com/dataTimeSpace/vuforia-spatial-toolbox-ios) that makes it compatible with the [Vuforia Spatial Toolbox Virtualizer](https://github.com/dataTimeSpace/vuforia-spatial-toolbox-virtualizer) Unity project. The result is a browser-based web app that combines a live volumetric capture of a space with mixed reality content.
 
-Full installation instructions are in the Vuforia Spatial Toolbox Virtualizer [README](https://github.com/ptcrealitylab/Vuforia-Spatial-Toolbox-Virtualizer#vuforia-spatial-toolbox-virtualizer).
+Full installation instructions are in the Vuforia Spatial Toolbox Virtualizer [README](https://github.com/dataTimeSpace/Vuforia-Spatial-Toolbox-Virtualizer#vuforia-spatial-toolbox-virtualizer).
 
 This add-on contains two hardware interfaces:
 1. `virtualizer`: This interface provides a websocket-based communication layer between the Vuforia Spatial Edge Server and the Unity application.
 2. `remoteOperatorUI`: This interface will serve the Remote Operator web app on `localhost:8081`.
 
-The add-on also contains some `content_scripts` that will modify the [Vuforia Spatial Toolbox User Interface](https://github.com/ptcrealitylab/vuforia-spatial-toolbox-userinterface) to be able to run in a desktop browser environment in addition to on a mobile AR device.
+The add-on also contains some `content_scripts` that will modify the [Vuforia Spatial Toolbox User Interface](https://github.com/dataTimeSpace/vuforia-spatial-toolbox-userinterface) to be able to run in a desktop browser environment in addition to on a mobile AR device.
 
 **Special Setup instructions:**
 1. Make sure to turn on both of these hardware interfaces in the "Manage Hardware Interfaces" tab of your Edge Server's web interface (`localhost:8080`)
-2. The `remoteOperatorUI` interface needs to be configured with a path to a local copy of the [Vuforia Spatial Toolbox User Interface](https://github.com/ptcrealitylab/vuforia-spatial-toolbox-userinterface) repository. Click on the yellow gear on the `remoteOperatorUI` interface to view its configurations, and type in the path (e.g. `/Users/Benjamin/Documents/vuforia-spatial-toolbox-userinterface`) and hit save.
+2. The `remoteOperatorUI` interface needs to be configured with a path to a local copy of the [Vuforia Spatial Toolbox User Interface](https://github.com/dataTimeSpace/vuforia-spatial-toolbox-userinterface) repository. Click on the yellow gear on the `remoteOperatorUI` interface to view its configurations, and type in the path (e.g. `/Users/Benjamin/Documents/vuforia-spatial-toolbox-userinterface`) and hit save.
 3. After configuring, restart your edge server to serve the web app on port 8081.
 4. In order to see any tools in the pocket menu of the Remote Operator, you need to have an activated "World Object" on your server. Click "Add World Object" on localhost:8080 and give it a target to activate it.
 
