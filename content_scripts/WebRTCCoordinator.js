@@ -465,29 +465,29 @@ import RVLParser from '../../thirdPartyCode/rvl/RVLParser.js';
 
             if (DEPTH_REPR_FORCE_PNG) {
                 switch (bytes[0]) {
-                case 0xff: {
-                    const imageUrl = URL.createObjectURL(new Blob([event.data], {type: 'image/jpeg'}));
-                    // Color is always JPEG which has first byte 0xff
-                    this.cameraVisCoordinator.renderPointCloud(id, 'texture', imageUrl);
-                }
-                    break;
+                    case 0xff: {
+                        const imageUrl = URL.createObjectURL(new Blob([event.data], { type: 'image/jpeg' }));
+                        // Color is always JPEG which has first byte 0xff
+                        this.cameraVisCoordinator.renderPointCloud(id, 'texture', imageUrl);
+                    }
+                        break;
 
-                case 0x89: {
-                    const imageUrl = URL.createObjectURL(new Blob([event.data], {type: 'image/png'}));
-                    // Depth is always PNG which has first byte 0x89
-                    this.cameraVisCoordinator.renderPointCloud(id, 'textureDepth', imageUrl);
-                }
-                    break;
+                    case 0x89: {
+                        const imageUrl = URL.createObjectURL(new Blob([event.data], { type: 'image/png' }));
+                        // Depth is always PNG which has first byte 0x89
+                        this.cameraVisCoordinator.renderPointCloud(id, 'textureDepth', imageUrl);
+                    }
+                        break;
                 }
             } else {
                 // jpeg start of image, chance of this happening from rvl is probably 0 but at most 1/(1 << 16)
                 if (bytes[0] === 0xff && bytes[1] === 0xd8) {
-                    const imageUrl = URL.createObjectURL(new Blob([event.data], {type: 'image/jpeg'}));
+                    const imageUrl = URL.createObjectURL(new Blob([event.data], { type: 'image/jpeg' }));
                     // Color is always JPEG which has first byte 0xff
                     this.cameraVisCoordinator.renderPointCloud(id, 'texture', imageUrl);
-                // PNG header for depth just in case
+                    // PNG header for depth just in case
                 } else if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
-                    const imageUrl = URL.createObjectURL(new Blob([event.data], {type: 'image/png'}));
+                    const imageUrl = URL.createObjectURL(new Blob([event.data], { type: 'image/png' }));
                     this.cameraVisCoordinator.renderPointCloud(id, 'textureDepth', imageUrl);
                 } else {
                     // if (!window.timings) {
