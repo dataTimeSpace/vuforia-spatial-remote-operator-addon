@@ -286,28 +286,22 @@ import RVLParser from '../../thirdPartyCode/rvl/RVLParser.js';
                     ],
                 }, {
                     urls: [
-                        'turn:turn.meta.ptc.io:443'
+                        'turn:global.relay.metered.ca:443',
                     ],
-                    username: 'test',
-                    credential: 'uWmkoS44agy7GTN',
+                    username: '8acb4b06045632a2f89c30e5',
+                    credential: 'Lcd8OP8zwkNihh2K',
                 }, {
                     urls: [
-                        'turn:a.relay.metered.ca:443',
+                        'turn:global.relay.metered.ca:80?transport=tcp',
                     ],
-                    username: 'c35c5795da892aeead553ae7',
-                    credential: 'QNFn8q+yPVb1XG6k',
+                    username: '8acb4b06045632a2f89c30e5',
+                    credential: 'Lcd8OP8zwkNihh2K',
                 }, {
                     urls: [
-                        'turn:a.relay.metered.ca:80?transport=tcp',
+                        'turn:global.relay.metered.ca:443?transport=tcp',
                     ],
-                    username: 'c35c5795da892aeead553ae7',
-                    credential: 'QNFn8q+yPVb1XG6k',
-                }, {
-                    urls: [
-                        'turn:spatial.ptc.io:3478'
-                    ],
-                    username: 'ptc',
-                    credential: 'pgnhOCNXxwH2rz1qiV2hOuckkOtuu6Tx',
+                    username: '8acb4b06045632a2f89c30e5',
+                    credential: 'Lcd8OP8zwkNihh2K',
                 }],
             });
 
