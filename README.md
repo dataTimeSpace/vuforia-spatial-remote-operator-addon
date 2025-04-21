@@ -32,4 +32,10 @@ The add-on also contains some `content_scripts` that will modify the [Vuforia Sp
   - `V`: Toggle visibility of extra UI
 4. You can select multiple Virtualizers running on two different computers to receive a combined volumetric video for a larger area. Click on both Virtualizers in the drop-down menu to connect to them both, and ensure that one of them is set as the Primary Virtualizer.
 
+## config.js
+
+Make sure to copy `content_scripts/config.template` to
+`content_scripts/config.js`. Optionally add more STUN/TURN servers for better
+connectivity.
+
 Please use the [forum](https://forum.spatialtoolbox.vuforia.com) for any questions.
