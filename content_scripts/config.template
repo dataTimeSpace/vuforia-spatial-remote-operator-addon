@@ -1,0 +1,14 @@
+/**
+ * Template file for config.js
+ * Add ice servers as necessary
+ */
+export const iceServers = [{
+    urls: [
+        'stun:stun.l.google.com:19302',
+        'stun:stun4.l.google.com:19305',
+    ],
+}, {
+    urls: [
+        'stun:stun.relay.metered.ca:80',
+    ],
+}];

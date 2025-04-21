@@ -10,3 +10,5 @@ node_modules
 
 #Https certs
 *.pem
+
+/content_scripts/config.js

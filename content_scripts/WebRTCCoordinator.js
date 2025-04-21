@@ -1,6 +1,7 @@
 createNameSpace('realityEditor.device.cameraVis');
 
 import RVLParser from '../../thirdPartyCode/rvl/RVLParser.js';
+import { iceServers } from './config.js';
 
 (function(exports) {
     const DEPTH_REPR_FORCE_PNG = false;
@@ -275,34 +276,7 @@ import RVLParser from '../../thirdPartyCode/rvl/RVLParser.js';
 
         initLocalConnection() {
             this.localConnection = new RTCPeerConnection({
-                iceServers: [{
-                    urls: [
-                        'stun:stun.l.google.com:19302',
-                        'stun:stun4.l.google.com:19305',
-                    ],
-                }, {
-                    urls: [
-                        'stun:stun.relay.metered.ca:80',
-                    ],
-                }, {
-                    urls: [
-                        'turn:global.relay.metered.ca:443',
-                    ],
-                    username: '8acb4b06045632a2f89c30e5',
-                    credential: 'Lcd8OP8zwkNihh2K',
-                }, {
-                    urls: [
-                        'turn:global.relay.metered.ca:80?transport=tcp',
-                    ],
-                    username: '8acb4b06045632a2f89c30e5',
-                    credential: 'Lcd8OP8zwkNihh2K',
-                }, {
-                    urls: [
-                        'turn:global.relay.metered.ca:443?transport=tcp',
-                    ],
-                    username: '8acb4b06045632a2f89c30e5',
-                    credential: 'Lcd8OP8zwkNihh2K',
-                }],
+                iceServers: iceServers,
             });
 
             this.localConnection.addEventListener('icecandidate', (e) => {
