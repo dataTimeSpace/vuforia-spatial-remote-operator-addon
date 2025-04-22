@@ -47,7 +47,7 @@ import Splatting from '../../src/splatting/Splatting.js';
         ReloadPage: 'Reload Page',
         GSSettingsPanel: 'GS Settings Panel',
         GSToggleRaycast: 'GS Toggle Raycast',
-        CloseAllTools: 'Close All Tools',
+        CloseAllOtherTools: 'No Tools Open',
     });
     exports.ITEM = ITEM;
 
@@ -75,12 +75,52 @@ import Splatting from '../../src/splatting/Splatting.js';
         menuBar.hideMenu(developMenu);
         menuBar.addMenu(new Menu(MENU.Help));
 
-        const closeAllTools = new MenuItem(ITEM.CloseAllTools, {}, () => {
+        const closeAllOtherTools = new MenuItem(ITEM.CloseAllOtherTools, { disabled: true }, () => {
+            const isAnythingCurrentlyFocused = realityEditor.envelopeManager.getFocusedEnvelopes().length > 0;
+            const numOthersOpen = realityEditor.envelopeManager.getOpenEnvelopes().filter(envelope => {
+                return !envelope.hasFocus;
+            }).length;
+            const canCloseActiveTool = isAnythingCurrentlyFocused && numOthersOpen === 0;
+
             realityEditor.envelopeManager.getOpenEnvelopes().forEach(envelope => {
-                realityEditor.envelopeManager.closeEnvelope(envelope.frame);
+                if (!envelope.hasFocus || canCloseActiveTool) {
+                    realityEditor.envelopeManager.closeEnvelope(envelope.frame);
+                }
             });
         });
-        menuBar.addItemToMenu(MENU.View, closeAllTools);
+        menuBar.addItemToMenu(MENU.View, closeAllOtherTools);
+
+        // Update the Close All Other Tools button text and disabled state based on current tool state
+        const updateCloseOtherTools = () => {
+            const isAnythingCurrentlyFocused = realityEditor.envelopeManager.getFocusedEnvelopes().length > 0;
+            const othersOpen = realityEditor.envelopeManager.getOpenEnvelopes().filter(envelope => {
+                return !envelope.hasFocus;
+            });
+            if (othersOpen.length > 0) {
+                if (isAnythingCurrentlyFocused) {
+                    // If something is focused, the button lets you close other distractions
+                    closeAllOtherTools.setText(`Close All Other Tools (${othersOpen.length})`);
+                } else {
+                    // If nothing is focused, the button lets you close everything
+                    closeAllOtherTools.setText(`Close All Tools (${othersOpen.length})`);
+                }
+                closeAllOtherTools.enable();
+            } else {
+                if (isAnythingCurrentlyFocused) {
+                    // If only one tool open, and it's actively focused, this button can close it
+                    closeAllOtherTools.setText('Close Active Tool');
+                    closeAllOtherTools.enable();
+                } else {
+                    // If no tools open...
+                    closeAllOtherTools.setText('No Tools Open');
+                    closeAllOtherTools.disable();
+                }
+            }
+        }
+        realityEditor.envelopeManager.onOpen(updateCloseOtherTools);
+        realityEditor.envelopeManager.onClose(updateCloseOtherTools);
+        realityEditor.envelopeManager.onFocus(updateCloseOtherTools);
+        realityEditor.envelopeManager.onBlur(updateCloseOtherTools);
 
         const togglePointClouds = new MenuItem(ITEM.PointClouds, { shortcutKey: 'M', toggle: true, defaultVal: true, disabled: true }, (value) => {
             console.log('toggle point clouds', value);
