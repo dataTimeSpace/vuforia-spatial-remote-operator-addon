@@ -39,6 +39,8 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
         scale: false
     };
 
+    const POINTER_OCCUPIED_FLAG = "desktopCameraVirtualCamera"
+
     let staticInteractionCursor = null;
     let interactionCursor = null;
     let pointerPosition = { x: 0, y: 0 };
@@ -544,17 +546,28 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
         });
     }
 
+    function updatePointerOccupiedByCamera() {
+        if (knownInteractionStates.pan || knownInteractionStates.rotate || knownInteractionStates.scale) {
+            realityEditor.device.setFlagForPointerOccupiedByCamera(POINTER_OCCUPIED_FLAG);
+        } else {
+            realityEditor.device.clearFlagForPointerOccupiedByCamera(POINTER_OCCUPIED_FLAG);
+        }
+    }
+
     function panToggled() {
+        updatePointerOccupiedByCamera();
         if (!cameraTargetIcon) return;
         cameraTargetIcon.visible = knownInteractionStates.pan || knownInteractionStates.rotate || knownInteractionStates.scale;
         updateInteractionCursor(cameraTargetIcon.visible, 'addons/vuforia-spatial-remote-operator-addon/cameraPan.svg');
     }
     function rotateToggled() {
+        updatePointerOccupiedByCamera();
         if (!cameraTargetIcon) return;
         cameraTargetIcon.visible = knownInteractionStates.rotate || knownInteractionStates.pan || knownInteractionStates.scale;
         updateInteractionCursor(cameraTargetIcon.visible, 'addons/vuforia-spatial-remote-operator-addon/cameraRotate.svg');
     }
     function scaleToggled() {
+        updatePointerOccupiedByCamera();
         if (!cameraTargetIcon) return;
         cameraTargetIcon.visible = knownInteractionStates.scale || knownInteractionStates.pan || knownInteractionStates.rotate;
 
