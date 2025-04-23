@@ -215,15 +215,25 @@ import Splatting from '../../src/splatting/Splatting.js';
         });
         menuBar.addItemToMenu(MENU.Develop, showFPS);
 
-        const deleteAllTools = new MenuItem(ITEM.DeleteAllTools, { toggle: false }, () => {
+        const deleteAllTools = new MenuItem(ITEM.DeleteAllTools, { toggle: false }, async () => {
+            const framesToDelete = [];
+
+            // collect frames to delete before we loop through them to perform the deletion
             realityEditor.forEachFrameInAllObjects((objectKey, frameKey) => {
                 let object = realityEditor.getObject(objectKey);
                 if (!object) return;
                 // only delete for regular objects, world objects, and anchor objects - don't delete avatar or human pose frames
                 if (object.type !== 'object' && object.type !== 'world' && object.type !== 'anchor') return;
+
                 let frameToDelete = realityEditor.getFrame(objectKey, frameKey);
-                realityEditor.device.tryToDeleteSelectedVehicle(frameToDelete);
+                if (frameToDelete) framesToDelete.push(frameToDelete);
             });
+
+            // go through each one and confirm individually with modals
+            for (const frame of framesToDelete) {
+                await realityEditor.device.tryToDeleteSelectedVehicle(frame);
+                // tryToDeleteSelectedVehicle will await any modals' decisions before the next one
+            }
         });
         menuBar.addItemToMenu(MENU.Develop, deleteAllTools);
 
