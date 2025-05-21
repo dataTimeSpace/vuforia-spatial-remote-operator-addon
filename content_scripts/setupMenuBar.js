@@ -48,6 +48,7 @@ import Splatting from '../../src/splatting/Splatting.js';
         GSSettingsPanel: 'GS Settings Panel',
         GSToggleRaycast: 'GS Toggle Raycast',
         CloseAllOtherTools: 'No Tools Open',
+        ToggleFullscreen: 'Enter Fullscreen',
     });
     exports.ITEM = ITEM;
 
@@ -74,6 +75,22 @@ import Splatting from '../../src/splatting/Splatting.js';
         menuBar.addMenu(developMenu);
         menuBar.hideMenu(developMenu);
         menuBar.addMenu(new Menu(MENU.Help));
+
+        const toggleFullscreen = new MenuItem(ITEM.ToggleFullscreen, {}, () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.body.requestFullscreen();
+            }
+        });
+        document.body.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                toggleFullscreen.setText('Exit Fullscreen');
+            } else {
+                toggleFullscreen.setText('Enter Fullscreen');
+            }
+        });
+        menuBar.addItemToMenu(MENU.View, toggleFullscreen);
 
         const closeAllOtherTools = new MenuItem(ITEM.CloseAllOtherTools, { disabled: true }, () => {
             const isAnythingCurrentlyFocused = realityEditor.envelopeManager.getFocusedEnvelopes().length > 0;
