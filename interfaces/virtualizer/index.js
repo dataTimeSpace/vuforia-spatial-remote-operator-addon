@@ -123,7 +123,7 @@ if (exports.enabled) {
             }
 
 
-        } catch (e) {
+        } catch (_e) {
         //console.log('could not parse json message: ' + e);
         }
 
@@ -181,7 +181,7 @@ if (exports.enabled) {
                 let partsData = data.split(';_;');
                 editorId = partsData[2];
                 // console.log('received image for ' + editorId);
-            } catch (e) {
+            } catch (_e) {
                 // console.log('error extracting editorId from image data', e);
             }
 
@@ -217,7 +217,7 @@ if (exports.enabled) {
                 parsedData = JSON.parse(data);
                 console.log(parsedData.type);
             } catch (e) {
-                console.log('cant parse ' + data);
+                console.log('cant parse ' + data, e);
             }
             if (parsedData.type === 'viewer') {
                 console.log('client identified as viewer. assigning it latest viewer and id: ' + socket.id + ' and editorId: ' + parsedData.editorId);
