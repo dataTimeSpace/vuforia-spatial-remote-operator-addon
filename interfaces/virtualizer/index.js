@@ -26,7 +26,9 @@ if (exports.enabled) {
     var http = require('http').Server(app);
     var ip = require('ip');
     var glob = require('glob');
-    var io = require('socket.io')(http, { wsEngine: 'ws' });
+    // TODO untested
+    const server8080 = require('../../../../server.js');
+    const io = server8080.io;
 
     var socket_list = [];
 
