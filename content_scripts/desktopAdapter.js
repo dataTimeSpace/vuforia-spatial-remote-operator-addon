@@ -400,7 +400,7 @@ createNameSpace('realityEditor.device.desktopAdapter');
                 if (typeof msgContent.action === 'string') {
                     try {
                         msgContent.action = JSON.parse(msgContent.action);
-                    } catch (e) {
+                    } catch (_e) {
                         // console.log('dont need to parse');
                     }
                 }

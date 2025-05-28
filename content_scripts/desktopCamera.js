@@ -608,8 +608,8 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
         staticInteractionCursor.style.display = visible ? 'inline' : 'none';
         if (staticImageInfo && staticImageInfo.src) {
             staticInteractionCursor.src = staticImageInfo.src;
-            staticInteractionCursor.style.width = `${staticImageInfo.width}px` || '30px';
-            staticInteractionCursor.style.height = `${staticImageInfo.height}px` || '30px';
+            staticInteractionCursor.style.width = `${staticImageInfo.width ?? 30}px`;
+            staticInteractionCursor.style.height = `${staticImageInfo.height ?? 30}px`;
         } else if (imageSrc) {
             staticInteractionCursor.src = imageSrc;
             staticInteractionCursor.style.width = '30px';

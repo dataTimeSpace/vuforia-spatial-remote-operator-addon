@@ -256,7 +256,7 @@ function startHTTPServer(localUIApp, port) {
                 // try to connect to custom input device
                 try {
                     connectTo6DMouse();
-                } catch (e) {
+                } catch (_e) {
                     // Did not connect to input hardware. Control remote operator with mouse + scroll wheel, right-click drag and shift-right-click-drag
                 }
 
