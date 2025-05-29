@@ -18,7 +18,7 @@ createNameSpace('realityEditor.gui');
         }
         buildDom() {
             this.domElement = document.createElement('div');
-            this.domElement.classList.add('desktopMenuBar');
+            this.domElement.classList.add('desktopMenuBar', 'zoom-wrapper');
         }
         setupKeyboard() {
             getKeyboard().onKeyDown((code, modifiers) => {

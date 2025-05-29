@@ -94,6 +94,8 @@ import Splatting from '../../src/splatting/Splatting.js';
             this.addNormalModePrompt();
             this.addFlyModePrompt();
 
+            realityEditor.device.layout.reapplyZoomValues();
+
             this.focusTargetCube = null;
             this.addFocusTargetCube();
             this.addEventListeners();
@@ -150,7 +152,7 @@ import Splatting from '../../src/splatting/Splatting.js';
         // div/container where all prompts get appended to
         createPromptContainer () {
             let promptContainer = document.createElement('div');
-            promptContainer.classList.add('mode-prompt-container');
+            promptContainer.classList.add('mode-prompt-container', 'zoom-wrapper');
 
             return promptContainer;
         }
@@ -192,7 +194,7 @@ import Splatting from '../../src/splatting/Splatting.js';
             if (this.isFlying) return;
 
             // add normal mode prompt
-            let promptTitle = 'Entered normal mode';
+            let promptTitle = 'Camera Controls:';
             let promptText = ['F - switch mode', 'G - focus', 'RMB - rotate', 'MMB/RMB+Alt - pan', 'scroll wheel - zoom'];
 
             let normalModePrompt = this.createPrompt(promptTitle, promptText);
@@ -203,7 +205,7 @@ import Splatting from '../../src/splatting/Splatting.js';
             if (!this.isFlying) return;
 
             // add fly mode prompt
-            let promptTitle = 'Entered fly mode';
+            let promptTitle = 'Camera Controls: Fly Mode';
             let promptText = ['F - switch mode', 'G - focus', 'Q/E - down/up', 'W/A/S/D - move', 'SHIFT - speed up'];
 
             let flyModePrompt = this.createPrompt(promptTitle, promptText);
