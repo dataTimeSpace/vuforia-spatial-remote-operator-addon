@@ -8,6 +8,7 @@
 
 var server = require('@libraries/hardwareInterfaces');
 var utilities = require('@libraries/utilities');
+const ToolSocket = require('toolsocket');
 
 var settings = server.loadHardwareInterface(__dirname);
 
@@ -26,9 +27,6 @@ if (exports.enabled) {
     var http = require('http').Server(app);
     var ip = require('ip');
     var glob = require('glob');
-    // TODO untested
-    const server8080 = require('../../../../server.js');
-    const io = server8080.io;
 
     var socket_list = [];
 
@@ -133,6 +131,11 @@ if (exports.enabled) {
 
 
     });
+
+    const httpServer = http.listen(3020, function() {
+        console.log('listening on *:3020');
+    });
+    const io = new ToolSocket.Server({server: httpServer});
 
     io.on('connection', function(socket) {
         console.log('my ip address: ' + ip.address());
@@ -716,9 +719,6 @@ if (exports.enabled) {
         });
     });
 
-    const httpServer = http.listen(3020, function() {
-        console.log('listening on *:3020');
-    });
     server.addEventListener('shutdown', () => {
         httpServer.close();
     });
