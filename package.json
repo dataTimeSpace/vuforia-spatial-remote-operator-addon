@@ -26,6 +26,6 @@
   "devDependencies": {
     "eslint": "^9.27.0",
     "globals": "^16.2.0",
-    "webrtc-adapter": "^9.0.1"
+    "webrtc-adapter": "^9.0.3"
   }
 }
