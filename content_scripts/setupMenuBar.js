@@ -6,6 +6,7 @@ import Splatting from '../../src/splatting/Splatting.js';
     let menuBar = null;
 
     const MENU = Object.freeze({
+        Edit: 'Edit',
         View: 'View',
         Camera: 'Camera',
         Follow: 'Follow',
@@ -49,8 +50,16 @@ import Splatting from '../../src/splatting/Splatting.js';
         GSToggleRaycast: 'GS Toggle Raycast',
         CloseAllOtherTools: 'No Tools Open',
         ToggleFullscreen: 'Enter Fullscreen',
+        Undo: 'Undo',
+        Redo: 'Redo',
     });
     exports.ITEM = ITEM;
+
+    // Menu items for undo and redo
+    let undo, redo;
+    // Callbacks for undo and redo that perform the tool-specific undoredo functionality if available
+    let undoCallback = null;
+    let redoCallback = null;
 
     // sets up the initial contents of the menuBar
     // other modules can add more to it by calling getMenuBar().addItemToMenu(menuName, menuItem)
@@ -63,7 +72,7 @@ import Splatting from '../../src/splatting/Splatting.js';
 
         menuBar = new MenuBar();
         // menuBar.addMenu(new Menu('File'));
-        // menuBar.addMenu(new Menu('Edit'));
+        menuBar.addMenu(new Menu(MENU.Edit));
         menuBar.addMenu(new Menu(MENU.View));
         menuBar.addMenu(new Menu(MENU.Camera));
         let followMenu = new Menu(MENU.Follow); // keep a reference, so we can show/hide it on demand
@@ -75,6 +84,24 @@ import Splatting from '../../src/splatting/Splatting.js';
         menuBar.addMenu(developMenu);
         menuBar.hideMenu(developMenu);
         menuBar.addMenu(new Menu(MENU.Help));
+
+        undo = new MenuItem(ITEM.Undo, {shortcutKey: 'Z', modifiers: ['CTRL'], disabled: `Tool can't undo`}, () => {
+            if (!undoCallback) {
+                console.warn('Attempt to undo without callback set');
+                return;
+            }
+            undoCallback();
+        });
+        menuBar.addItemToMenu(MENU.Edit, undo);
+
+        redo = new MenuItem(ITEM.Redo, {shortcutKey: 'Z', modifiers: ['CTRL', 'SHIFT'], disabled: `Tool can't redo`}, () => {
+            if (!redoCallback) {
+                console.warn('Attempt to redo without callback set');
+                return;
+            }
+            redoCallback();
+        });
+        menuBar.addItemToMenu(MENU.Edit, redo);
 
         const toggleFullscreen = new MenuItem(ITEM.ToggleFullscreen, {}, () => {
             if (document.fullscreenElement) {
@@ -306,7 +333,23 @@ import Splatting from '../../src/splatting/Splatting.js';
         return menuBar;
     };
 
+    function setUndoRedoCallbacks(newUndoCallback, newRedoCallback) {
+        undo.enable();
+        redo.enable();
+        undoCallback = newUndoCallback;
+        redoCallback = newRedoCallback;
+    }
+
+    function clearUndoRedoCallbacks() {
+        undo.disable();
+        redo.disable();
+        undoCallback = null;
+        redoCallback = null;
+    }
+
     exports.setupMenuBar = setupMenuBar;
     exports.getMenuBar = getMenuBar;
+    exports.setUndoRedoCallbacks = setUndoRedoCallbacks;
+    exports.clearUndoRedoCallbacks = clearUndoRedoCallbacks;
 
 })(realityEditor.gui);
