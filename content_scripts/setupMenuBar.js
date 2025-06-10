@@ -223,11 +223,10 @@ import Splatting from '../../src/splatting/Splatting.js';
         const resetCamera = new MenuItem(ITEM.ResetCameraPosition, { shortcutKey: 'ESCAPE' }, null);
         menuBar.addItemToMenu(MENU.Camera, resetCamera);
 
-        // TODO: build a better Getting Started / Help experience
-        // const gettingStarted = new MenuItem(ITEM.GettingStarted, null, () => {
-        //     window.open('https://spatialtoolbox.vuforia.com/', '_blank');
-        // });
-        // menuBar.addItemToMenu(MENU.Help, gettingStarted);
+        const gettingStarted = new MenuItem(ITEM.GettingStarted, null, () => {
+            window.open('https://docs.datatime.space/', '_blank');
+        });
+        menuBar.addItemToMenu(MENU.Help, gettingStarted);
 
         // useful in Teams or other iframe-embedded versions of the app, where you are otherwise unable to refresh the page
         const reloadPage = new MenuItem(ITEM.ReloadPage, null, () => {
