@@ -345,6 +345,10 @@ createNameSpace('realityEditor.gui');
             return !checkmark.classList.contains('desktopMenuBarItemCheckmarkHidden');
         }
         disable() {
+            if (typeof this.options.disabled === 'string') {
+                this.domElement.setAttribute('title', this.options.disabled);
+            }
+
             this.domElement.classList.add('desktopMenuBarItemDisabled');
             let checkmark = this.domElement.querySelector('.desktopMenuBarItemCheckmark');
             if (checkmark) {
@@ -352,6 +356,10 @@ createNameSpace('realityEditor.gui');
             }
         }
         enable() {
+            if (typeof this.options.disabled === 'string') {
+                this.domElement.removeAttribute('title');
+            }
+
             this.domElement.classList.remove('desktopMenuBarItemDisabled');
             let checkmark = this.domElement.querySelector('.desktopMenuBarItemCheckmark');
             if (checkmark) {
