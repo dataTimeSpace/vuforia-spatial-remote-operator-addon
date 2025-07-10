@@ -443,7 +443,7 @@ import Splatting from '../../src/splatting/Splatting.js';
                         this.mouseInput.unprocessedDX += xOffset;
                         this.mouseInput.unprocessedDY += yOffset;
                     } else if (this.touchControlMode === 'zoom') {
-                        const biggerDirection = Math.abs(yOffset) > Math.abs(xOffset) ? yOffset : xOffset;
+                        const biggerDirection = Math.abs(yOffset) > Math.abs(xOffset) ? yOffset : -xOffset;
                         this.mouseInput.unprocessedScroll += (biggerDirection * 2);
                     }
                 }
