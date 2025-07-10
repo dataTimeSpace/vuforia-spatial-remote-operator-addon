@@ -103,6 +103,17 @@ import Splatting from '../../src/splatting/Splatting.js';
             this.threeJsContainer.position.y = -floorOffset;
             this.threeJsContainer.rotation.x = Math.PI / 2;
             realityEditor.gui.threejsScene.addToScene(this.threeJsContainer);
+
+            realityEditor.app.targetDownloader.onNavmeshCreated((navmesh) => {
+                // Save this so we can orbit around the area mesh center
+                this.navmeshCentroid = new THREE.Vector3(
+                    1000 * (navmesh.maxX + navmesh.minX) / 2,
+                    1000 * (navmesh.maxY + navmesh.minY) / 2,
+                    1000 * (navmesh.maxZ + navmesh.minZ) / 2,
+                );
+                // when the scene loads, center the camera to point at the center of the area target
+                this.targetPosition = [this.navmeshCentroid.x, this.navmeshCentroid.y, this.navmeshCentroid.z];
+            });
         }
 
         /**
@@ -432,7 +443,8 @@ import Splatting from '../../src/splatting/Splatting.js';
                         this.mouseInput.unprocessedDX += xOffset;
                         this.mouseInput.unprocessedDY += yOffset;
                     } else if (this.touchControlMode === 'zoom') {
-                        this.mouseInput.unprocessedScroll += (yOffset * 2);
+                        const biggerDirection = Math.abs(yOffset) > Math.abs(xOffset) ? yOffset : xOffset;
+                        this.mouseInput.unprocessedScroll += (biggerDirection * 2);
                     }
                 }
 
@@ -801,9 +813,18 @@ import Splatting from '../../src/splatting/Splatting.js';
                 let rotateFactor = -Math.pow(angle / Math.PI, 2) * 4 + 1;
                 let xRot = -this.mouseInput.unprocessedDY * 0.01 * rotateFactor;
                 let yRot = -this.mouseInput.unprocessedDX * 0.01 * rotateFactor;
+
                 let camPos = new THREE.Vector3().fromArray(this.position);
-                let target = new THREE.Vector3().fromArray(this.mouseInput.startOrbitPos);
-                this.orbit(xRot, yRot, camPos, camLookAt, target);
+
+                // if the user explicitly picks the single-finger "Rotate" tool on mobile,
+                // orbit around the scene origin. Otherwise, orbit around the pointer-down hit point
+                let pivot;
+                if (this.touchControlMode === 'rotate') {
+                    pivot = this.navmeshCentroid ? this.navmeshCentroid.clone() : new THREE.Vector3(0,0,0);
+                } else {
+                    pivot = new THREE.Vector3().fromArray(this.mouseInput.startOrbitPos);
+                }
+                this.orbit(xRot, yRot, camPos, camLookAt, pivot);
 
                 this.deselectTarget();
 

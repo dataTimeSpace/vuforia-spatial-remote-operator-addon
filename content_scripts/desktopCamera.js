@@ -805,6 +805,7 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
 
             if (touchControlButtons) {
                 touchControlButtons.activate();
+                // onTransitionPercent can override this with 'rotate' if we slide all the way to the right
                 touchControlButtons.selectMode('pointer'); // select pointer mode by default
             }
         });
@@ -819,6 +820,18 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
             if (touchControlButtons) {
                 touchControlButtons.deactivate();
                 touchControlButtons.selectMode(null); // deselect all modes and propagate state to virtual camera
+            }
+        });
+
+        realityEditor.device.modeTransition.onTransitionPercent((percent) => {
+            if (touchControlButtons) {
+                if (percent >= 1 && touchControlButtons.container.classList.contains('hidden-controls-transition')) {
+                    touchControlButtons.container.classList.remove('hidden-controls-transition');
+                    touchControlButtons.selectMode(touchControlButtons.MODES.rotate);
+                } else if (percent < 1 && !touchControlButtons.container.classList.contains('hidden-controls-transition')) {
+                    touchControlButtons.container.classList.add('hidden-controls-transition');
+                    touchControlButtons.selectMode(touchControlButtons.MODES.pointer);
+                }
             }
         });
     }
