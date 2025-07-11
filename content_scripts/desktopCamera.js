@@ -6,6 +6,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+/* global overlayDiv, overlayDiv2 */
+
 createNameSpace('realityEditor.device.desktopCamera');
 
 import { Vector3 } from '../../thirdPartyCode/three/three.module.js';
@@ -805,6 +807,7 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
 
             if (touchControlButtons) {
                 touchControlButtons.activate();
+                // onTransitionPercent can override this with 'rotate' if we slide all the way to the right
                 touchControlButtons.selectMode('pointer'); // select pointer mode by default
             }
         });
@@ -819,6 +822,35 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
             if (touchControlButtons) {
                 touchControlButtons.deactivate();
                 touchControlButtons.selectMode(null); // deselect all modes and propagate state to virtual camera
+            }
+        });
+
+        realityEditor.device.modeTransition.onTransitionPercent((percent) => {
+            if (touchControlButtons) {
+                if (percent >= 1 && touchControlButtons.container.classList.contains('hidden-controls-transition')) {
+                    touchControlButtons.container.classList.remove('hidden-controls-transition');
+                    touchControlButtons.selectMode(touchControlButtons.MODES.rotate);
+
+                    // just in case, turn off the pointer beam since we're changing the mode
+                    realityEditor.avatar.setBeamOff();
+                    updatePointerOccupiedByCamera();
+                    // hide and reset the overlay divs, since touch camera controls interrupt their normal behavior
+                    [overlayDiv, overlayDiv2].forEach((overlay) => {
+                        overlay.style.display = 'none';
+                    });
+
+                } else if (percent < 1 && !touchControlButtons.container.classList.contains('hidden-controls-transition')) {
+                    touchControlButtons.container.classList.add('hidden-controls-transition');
+                    touchControlButtons.selectMode(touchControlButtons.MODES.pointer);
+
+                    // just in case, hide the interaction cursor (shown during zoom, rotate, pan)
+                    cameraTargetIcon.visible = false;
+                    updateInteractionCursor(cameraTargetIcon.visible, 'addons/vuforia-spatial-remote-operator-addon/cameraRotate.svg');
+                    knownInteractionStates.pan = false;
+                    knownInteractionStates.rotate = false;
+                    knownInteractionStates.zoom = false;
+                    updatePointerOccupiedByCamera();
+                }
             }
         });
     }

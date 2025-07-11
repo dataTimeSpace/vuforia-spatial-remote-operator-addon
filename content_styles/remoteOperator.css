@@ -275,6 +275,10 @@ body > * {
     transform: translateZ(1000px);
 }
 
+.hidden-controls-transition {
+    display: none;
+}
+
 .touchControlButtonContainer {
     width: 44px;
     height: 44px;
