@@ -333,15 +333,15 @@ import Splatting from '../../src/splatting/Splatting.js';
     };
 
     function setUndoRedoCallbacks(newUndoCallback, newRedoCallback) {
-        undo.enable();
-        redo.enable();
+        if (undo) undo.enable();
+        if (redo) redo.enable();
         undoCallback = newUndoCallback;
         redoCallback = newRedoCallback;
     }
 
     function clearUndoRedoCallbacks() {
-        undo.disable();
-        redo.disable();
+        if (undo) undo.disable();
+        if (redo) redo.disable();
         undoCallback = null;
         redoCallback = null;
     }
