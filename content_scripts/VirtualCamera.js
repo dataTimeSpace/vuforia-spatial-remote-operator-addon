@@ -567,16 +567,34 @@ import Splatting from '../../src/splatting/Splatting.js';
                 }
             };
 
+            const doControlsGetTouchDown = (event) => {
+                // we don't get the touch if no mode is enabled or if we're actively changing the mode
+                if (!this.touchControlMode || event.target.classList.contains('touchControlButtonIcon')) {
+                    return false;
+                }
+
+                const isHittingSceneBackground = realityEditor.device.utilities.isEventHittingBackground(event);
+                if (this.touchControlMode === 'pointer') {
+                    // the pointer mode lets you interact normally with tool iframes; only capture if we hit background
+                    return isHittingSceneBackground;
+                } else {
+                    // pan, rotate, and zoom take priority over interacting with non-full-2d tools
+                    // e.g. if analytics tool is open, you can still preview the scan and pan/rotate without closing it
+                    const isHittingTool = event.target.classList.contains('mainProgram');
+                    return (isHittingSceneBackground || isHittingTool);
+                }
+            }
+
             // Add touch event listeners to the document, which trigger the "TouchControl" functions
             // if a specific touchControlMode has been selected, or the "multitouch" functions if not
             document.addEventListener('touchstart',  async (event) => {
-                if (!realityEditor.device.utilities.isEventHittingBackground(event)) return;
+                if (!doControlsGetTouchDown(event)) return;
                 // while pinching to enter remote operator in AR app, don't trigger additional camera gestures
                 if (this.pauseTouchGestures) return;
 
                 isMultitouchGestureActive = true;
 
-                if (this.isTouchControlModeActive()) {
+                if (this.isTouchControlModeActive()) { // pan, rotate, zoom
                     await handleTouchControlDown(event);
                     return;
                 }
