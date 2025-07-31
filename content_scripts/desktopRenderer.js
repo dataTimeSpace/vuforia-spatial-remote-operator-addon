@@ -22,6 +22,12 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
     const PROXY = !window.location.port || window.location.port === "443";
 
     /**
+     * Support the legacy streaming of image data from the Reality Zone Unity project to the background canvas
+     * @type {boolean}
+     */
+    const ENABLE_REALITY_ZONE_CANVASES = false;
+
+    /**
      * @type {Canvas} - the DOM element where the images streamed from a reality zone are rendered
      */
     var backgroundCanvas;
@@ -315,23 +321,25 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
 
         // create background canvas and supporting canvasses
 
-        backgroundCanvas = document.createElement('canvas');
-        backgroundCanvas.id = 'desktopBackgroundRenderer';
-        backgroundCanvas.classList.add('desktopBackgroundRenderer');
-        backgroundCanvas.style.transform = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)'; // render behind three.js
-        backgroundCanvas.style.transformOrigin = 'top left';
-        backgroundCanvas.style.position = 'absolute';
-        backgroundCanvas.style.visibility = 'hidden';
-        primaryBackgroundCanvas = document.createElement('canvas');
-        secondaryBackgroundCanvas = document.createElement('canvas');
+        if (ENABLE_REALITY_ZONE_CANVASES) {
+            backgroundCanvas = document.createElement('canvas');
+            backgroundCanvas.id = 'desktopBackgroundRenderer';
+            backgroundCanvas.classList.add('desktopBackgroundRenderer');
+            backgroundCanvas.style.transform = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)'; // render behind three.js
+            backgroundCanvas.style.transformOrigin = 'top left';
+            backgroundCanvas.style.position = 'absolute';
+            backgroundCanvas.style.visibility = 'hidden';
+            primaryBackgroundCanvas = document.createElement('canvas');
+            secondaryBackgroundCanvas = document.createElement('canvas');
 
-        updateCanvasSize();
-        window.addEventListener('resize', updateCanvasSize);
+            updateCanvasSize();
+            window.addEventListener('resize', updateCanvasSize);
+
+            // add the Reality Zone background behind everything else
+            document.body.insertBefore(backgroundCanvas, document.body.childNodes[0]);
+        }
 
         // backgroundRenderer.src = "https://www.youtube.com/embed/XOacA3RYrXk?enablejsapi=1&rel=0&amp;controls=0&playsinline=1&vq=large";
-
-        // add the Reality Zone background behind everything else
-        document.body.insertBefore(backgroundCanvas, document.body.childNodes[0]);
 
         realityEditor.gui.getMenuBar().addCallbackToItem(realityEditor.gui.ITEM.ModelVisibility, setModelVisibility);
 
@@ -472,6 +480,8 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
      * Updates canvas size for resize events
      */
     function updateCanvasSize() {
+        if (!ENABLE_REALITY_ZONE_CANVASES) return;
+
         backgroundCanvas.width = window.innerWidth;
         backgroundCanvas.height = window.innerHeight;
         primaryBackgroundCanvas.width = window.innerWidth;
@@ -488,6 +498,8 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
      * @param {string} msgContent - contains the image data encoded as a base64 string
      */
     function processImageFromSource(source, msgContent) {
+        if (!ENABLE_REALITY_ZONE_CANVASES) return;
+
         // if (typeof msgContent.base64String !== 'undefined') {
         //     var imageBlobUrl = realityEditor.device.utilities.decodeBase64JpgToBlobUrl(msgContent.base64String);
         //     backgroundRenderer.src = imageBlobUrl;
@@ -525,6 +537,8 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
     }
 
     function renderBackground() {
+        if (!ENABLE_REALITY_ZONE_CANVASES) return;
+
         let gfx = backgroundCanvas.getContext('2d');
         gfx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
         gfx.drawImage(primaryBackgroundCanvas, 0, 0);
