@@ -163,6 +163,11 @@ import Splatting from '../../src/splatting/Splatting.js';
             let promptContainer = document.createElement('div');
             promptContainer.classList.add('mode-prompt-container');
 
+            // we can't change camera modes in the AR app, so no need to render this
+            if (realityEditor.device.environment.isWithinToolboxApp()) {
+                promptContainer.style.display = 'none';
+            }
+
             return promptContainer;
         }
         // function for creating prompts
