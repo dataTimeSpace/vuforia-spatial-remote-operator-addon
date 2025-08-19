@@ -263,6 +263,11 @@ import Splatting from '../../src/splatting/Splatting.js';
 
             let scrollTimeout = null;
             window.addEventListener('wheel', function (event) {
+                const sidebar = document.querySelector('.sidebar-shell');
+                if (sidebar && sidebar.contains(event.target)) {
+                    return; // let the browser handle it naturally instead of giving the event to the VirtualCamera
+                }
+
                 // restrict deltaY between [-100, 100], to prevent mouse wheel deltaY so large that camera cannot focus on focus point when zooming in
                 let wheelAmt = Math.max(-40, Math.min(40, event.deltaY));
                 this.mouseInput.unprocessedScroll += wheelAmt;
