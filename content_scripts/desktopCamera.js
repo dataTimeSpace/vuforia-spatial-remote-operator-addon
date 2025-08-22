@@ -15,6 +15,7 @@ import { CameraFollowCoordinator } from './CameraFollowCoordinator.js';
 import { MotionStudyFollowable } from './MotionStudyFollowable.js';
 import { TouchControlButtons } from './TouchControlButtons.js';
 import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
+import ui from '../../src/gui/UIManager.js';
 
 /**
  * @fileOverview realityEditor.device.desktopCamera.js
@@ -473,7 +474,7 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
             border.appendChild(textDiv);
         }
 
-        document.body.appendChild(border);
+        ui.addToZone(ui.VIEWPORT, border);
     }
 
     /**
@@ -508,7 +509,7 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
 
         // add the buttons to the screen
         touchControlButtons = new TouchControlButtons();
-        document.body.appendChild(touchControlButtons.container);
+        ui.addToZone(ui.VIEWPORT, touchControlButtons.container);
         touchControlButtons.container.id = 'touchControlsContainer';
 
         const FLAG_NAME = 'touchCameraControlButtons';
