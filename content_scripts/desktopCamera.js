@@ -15,7 +15,13 @@ import { CameraFollowCoordinator } from './CameraFollowCoordinator.js';
 import { MotionStudyFollowable } from './MotionStudyFollowable.js';
 import { TouchControlButtons } from './TouchControlButtons.js';
 import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
-import ui from '../../src/gui/UIManager.js';
+
+let ui; // import ui from '../../src/gui/UIManager.js'; <-- use this when we've fully migrated
+try {
+    ui = await import('../../src/gui/UIManager.js');
+} catch (_err) {
+    console.warn('[VirtualCamera.js] UIManager.js not found, skipping import.');
+}
 
 /**
  * @fileOverview realityEditor.device.desktopCamera.js

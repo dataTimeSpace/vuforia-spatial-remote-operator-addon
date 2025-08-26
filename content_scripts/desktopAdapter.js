@@ -253,7 +253,8 @@ createNameSpace('realityEditor.device.desktopAdapter');
 
         document.getElementById('groundPlaneResetButton').classList.add('hiddenDesktopButton');
 
-        realityEditor.device.layout.onViewportResized(({width, height}) => {
+        let onResizeListener = realityEditor.device.layout.onViewportResized ?? realityEditor.device.layout.onWindowResized;
+        onResizeListener(({width, height}) => {
             calculateProjectionMatrices(width, height);
         });
 

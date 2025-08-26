@@ -273,12 +273,14 @@ import { getRaycastPoint } from '../../src/gui/ar/raycast.js';
 
             let scrollTimeout = null;
             window.addEventListener('wheel', function (event) {
-                let viewportRect = realityEditor.device.layout.getCachedViewportRect();
-                if (event.pageX < viewportRect.left ||
-                    event.pageY < viewportRect.top ||
-                    event.pageX > viewportRect.left + viewportRect.width ||
-                    event.pageY > viewportRect.top + viewportRect.height) {
-                    return; // skip if the event occurs outside the viewport
+                if (typeof realityEditor.device.layout.getViewportRect !== 'undefined') {
+                    let viewportRect = realityEditor.device.layout.getViewportRect();
+                    if (event.pageX < viewportRect.left ||
+                        event.pageY < viewportRect.top ||
+                        event.pageX > viewportRect.left + viewportRect.width ||
+                        event.pageY > viewportRect.top + viewportRect.height) {
+                        return; // skip if the event occurs outside the viewport
+                    }
                 }
 
                 // restrict deltaY between [-100, 100], to prevent mouse wheel deltaY so large that camera cannot focus on focus point when zooming in
@@ -686,7 +688,11 @@ import { getRaycastPoint } from '../../src/gui/ar/raycast.js';
         reset() {
             this.stopFollowing();
             this.position = [this.initialPosition[0], this.initialPosition[1], this.initialPosition[2]];
-            this.targetPosition = [0, 0, 0];
+            if (this.navmeshCentroid) {
+                this.targetPosition = [this.navmeshCentroid.x, this.navmeshCentroid.y, this.navmeshCentroid.z];
+            } else {
+                this.targetPosition = [0, 0, 0];
+            }
             this.mouseInput.lastWorldPos = [0, 0, 0];
             this.mouseInput.startOrbitPos = [0, 0, 0];
             this.focusTargetCube.position.copy(new THREE.Vector3().fromArray(this.mouseInput.lastWorldPos));
