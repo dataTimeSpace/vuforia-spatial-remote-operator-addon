@@ -480,7 +480,11 @@ try {
             border.appendChild(textDiv);
         }
 
-        ui.addToZone(ui.VIEWPORT, border);
+        if (ui) {
+            ui.addToZone(ui.VIEWPORT, border);
+        } else {
+            document.body.appendChild(border);
+        }
     }
 
     /**
@@ -515,7 +519,11 @@ try {
 
         // add the buttons to the screen
         touchControlButtons = new TouchControlButtons();
-        ui.addToZone(ui.VIEWPORT, touchControlButtons.container);
+        if (ui) {
+            ui.addToZone(ui.VIEWPORT, touchControlButtons.container);
+        } else {
+            document.body.appendChild(touchControlButtons.container);
+        }
         touchControlButtons.container.id = 'touchControlsContainer';
 
         const FLAG_NAME = 'touchCameraControlButtons';
