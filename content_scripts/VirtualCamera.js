@@ -6,7 +6,14 @@ createNameSpace('realityEditor.device');
 
 import * as THREE from '../../thirdPartyCode/three/three.module.js';
 import Splatting from '../../src/splatting/Splatting.js';
-import { getRaycastPoint } from '../../src/gui/ar/raycast.js';
+
+let getRaycastPoint; // import { getRaycastPoint } from '../../src/gui/ar/raycast.js'; <-- use this when we've fully migrated
+try {
+    let raycastModule = await import('../../src/gui/ar/raycast.js');
+    getRaycastPoint = raycastModule.getRaycastPoint;
+} catch (_err) {
+    console.warn('[VirtualCamera.js] raycast.js not found, skipping import.');
+}
 
 (function (exports) {
 
@@ -240,15 +247,22 @@ import { getRaycastPoint } from '../../src/gui/ar/raycast.js';
             // if (event.button === 2 || !realityEditor.device.environment.variables.requiresMouseEvents) {
             if (forceSet || event.button === 2 || !realityEditor.device.environment.variables.requiresMouseEvents) {
 
-                // this automatically accounts for viewport vs page coordinates
-                let worldIntersectPoint = await getRaycastPoint({
-                    coords: { page: { x: event.pageX, y: event.pageY } },
-                    includeGroundPlane: true,
+                // raycasting supports backwards-compatibility until the viewport migration is complete
+                let worldIntersectPoint;
+                if (typeof getRaycastPoint !== 'undefined') {
+                    // this automatically accounts for viewport vs page coordinates
+                    worldIntersectPoint = await getRaycastPoint({
+                        coords: { page: { x: event.pageX, y: event.pageY } },
+                        includeGroundPlane: true,
+                        // Ignore frames for raycasting spatial cursor position if in AR mode, due to visual lag
+                        includeFrames: !realityEditor.device.environment.isARMode(),
+                        flipNormalTowardCamera: false,
+                        relativeToGround: true,
+                    });
+                } else {
                     // Ignore frames for raycasting spatial cursor position if in AR mode, due to visual lag
-                    includeFrames: !realityEditor.device.environment.isARMode(),
-                    flipNormalTowardCamera: false,
-                    relativeToGround: true,
-                });
+                    worldIntersectPoint = (await realityEditor.spatialCursor.getRaycastCoordinates(event.pageX, event.pageY, true, realityEditor.device.environment.isARMode())).point;
+                }
 
                 if (worldIntersectPoint === undefined) return;
                 // record pointerdown world intersect point, for off-center camera rotation
