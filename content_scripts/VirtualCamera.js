@@ -7,12 +7,14 @@ createNameSpace('realityEditor.device');
 import * as THREE from '../../thirdPartyCode/three/three.module.js';
 import Splatting from '../../src/splatting/Splatting.js';
 
-let getRaycastPoint; // import { getRaycastPoint } from '../../src/gui/ar/raycast.js'; <-- use this when we've fully migrated
+let getRaycastPoint; // import { getRaycastPoint } from '../../src/gui/ar/raycastHelper.js'; <-- use this when we've fully migrated
+let SPACES;
 try {
-    let raycastModule = await import('../../src/gui/ar/raycast.js');
+    let raycastModule = await import('../../src/gui/ar/raycastHelper.js');
     getRaycastPoint = raycastModule.getRaycastPoint;
+    SPACES = raycastModule.SPACES;
 } catch (_err) {
-    console.warn('[VirtualCamera.js] raycast.js not found, skipping import.');
+    console.warn('[VirtualCamera.js] raycastHelper.js not found, skipping import.');
 }
 
 (function (exports) {
@@ -253,11 +255,10 @@ try {
                     // this automatically accounts for viewport vs page coordinates
                     worldIntersectPoint = await getRaycastPoint({
                         coords: { page: { x: event.pageX, y: event.pageY } },
-                        includeGroundPlane: true,
                         // Ignore frames for raycasting spatial cursor position if in AR mode, due to visual lag
-                        includeFrames: !realityEditor.device.environment.isARMode(),
+                        include: { scene: true, ground: true, frames: !realityEditor.device.environment.isARMode() },
                         flipNormalTowardCamera: false,
-                        relativeToGround: true,
+                        returnSpace: SPACES.GROUND
                     });
                 } else {
                     // Ignore frames for raycasting spatial cursor position if in AR mode, due to visual lag
