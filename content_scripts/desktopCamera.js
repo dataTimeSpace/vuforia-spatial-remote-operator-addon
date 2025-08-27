@@ -16,11 +16,12 @@ import { MotionStudyFollowable } from './MotionStudyFollowable.js';
 import { TouchControlButtons } from './TouchControlButtons.js';
 import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
 
-let ui; // import ui from '../../src/gui/UIManager.js'; <-- use this when we've fully migrated
+let uiManager; // import ui from '../../src/gui/UIManager.js'; <-- use this when we've fully migrated
 try {
-    ui = await import('../../src/gui/UIManager.js');
+    // import the singleton UIManager to add elements to the viewport
+    uiManager = await import('../../src/gui/UIManager.js');
 } catch (_err) {
-    console.warn('[VirtualCamera.js] UIManager.js not found, skipping import.');
+    console.warn('[desktopCamera.js] UIManager.js not found, skipping import.');
 }
 
 /**
@@ -480,8 +481,8 @@ try {
             border.appendChild(textDiv);
         }
 
-        if (ui) {
-            ui.addToZone(ui.VIEWPORT, border);
+        if (uiManager) {
+            uiManager.addToZone(uiManager.VIEWPORT, border);
         } else {
             document.body.appendChild(border);
         }
@@ -519,8 +520,8 @@ try {
 
         // add the buttons to the screen
         touchControlButtons = new TouchControlButtons();
-        if (ui) {
-            ui.addToZone(ui.VIEWPORT, touchControlButtons.container);
+        if (uiManager) {
+            uiManager.addToZone(uiManager.VIEWPORT, touchControlButtons.container);
         } else {
             document.body.appendChild(touchControlButtons.container);
         }
