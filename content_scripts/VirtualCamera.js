@@ -7,6 +7,16 @@ createNameSpace('realityEditor.device');
 import * as THREE from '../../thirdPartyCode/three/three.module.js';
 import Splatting from '../../src/splatting/Splatting.js';
 
+let getRaycastPoint; // import { getRaycastPoint } from '../../src/gui/ar/raycastHelper.js'; <-- use this when we've fully migrated
+let SPACES;
+try {
+    let raycastModule = await import('../../src/gui/ar/raycastHelper.js');
+    getRaycastPoint = raycastModule.getRaycastPoint;
+    SPACES = raycastModule.SPACES;
+} catch (_err) {
+    console.warn('[VirtualCamera.js] raycastHelper.js not found, skipping import.');
+}
+
 (function (exports) {
 
     const DISPLAY_PERSPECTIVE_CUBES = false;
@@ -238,8 +248,23 @@ import Splatting from '../../src/splatting/Splatting.js';
             // conform to spatial cursor mousemove event pageX and pageY
             // if (event.button === 2 || !realityEditor.device.environment.variables.requiresMouseEvents) {
             if (forceSet || event.button === 2 || !realityEditor.device.environment.variables.requiresMouseEvents) {
-                // Ignore frames for raycasting spatial cursor position if in AR mode, due to visual lag
-                let worldIntersectPoint = (await realityEditor.spatialCursor.getRaycastCoordinates(event.pageX, event.pageY, true, realityEditor.device.environment.isARMode())).point;
+
+                // raycasting supports backwards-compatibility until the viewport migration is complete
+                let worldIntersectPoint;
+                if (typeof getRaycastPoint !== 'undefined') {
+                    // this automatically accounts for viewport vs page coordinates
+                    worldIntersectPoint = await getRaycastPoint({
+                        coords: { page: { x: event.pageX, y: event.pageY } },
+                        // Ignore frames for raycasting spatial cursor position if in AR mode, due to visual lag
+                        include: { scene: true, ground: true, frames: !realityEditor.device.environment.isARMode() },
+                        flipNormalTowardCamera: false,
+                        returnSpace: SPACES.GROUND
+                    });
+                } else {
+                    // Ignore frames for raycasting spatial cursor position if in AR mode, due to visual lag
+                    worldIntersectPoint = (await realityEditor.spatialCursor.getRaycastCoordinates(event.pageX, event.pageY, true, realityEditor.device.environment.isARMode())).point;
+                }
+
                 if (worldIntersectPoint === undefined) return;
                 // record pointerdown world intersect point, for off-center camera rotation
                 this.mouseInput.lastWorldPos = [worldIntersectPoint.x, worldIntersectPoint.y, worldIntersectPoint.z];
@@ -263,6 +288,16 @@ import Splatting from '../../src/splatting/Splatting.js';
 
             let scrollTimeout = null;
             window.addEventListener('wheel', function (event) {
+                if (typeof realityEditor.device.layout.getViewportRect !== 'undefined') {
+                    let viewportRect = realityEditor.device.layout.getViewportRect();
+                    if (event.pageX < viewportRect.left ||
+                        event.pageY < viewportRect.top ||
+                        event.pageX > viewportRect.left + viewportRect.width ||
+                        event.pageY > viewportRect.top + viewportRect.height) {
+                        return; // skip if the event occurs outside the viewport
+                    }
+                }
+
                 // restrict deltaY between [-100, 100], to prevent mouse wheel deltaY so large that camera cannot focus on focus point when zooming in
                 let wheelAmt = Math.max(-40, Math.min(40, event.deltaY));
                 this.mouseInput.unprocessedScroll += wheelAmt;
@@ -668,7 +703,11 @@ import Splatting from '../../src/splatting/Splatting.js';
         reset() {
             this.stopFollowing();
             this.position = [this.initialPosition[0], this.initialPosition[1], this.initialPosition[2]];
-            this.targetPosition = [0, 0, 0];
+            if (this.navmeshCentroid) {
+                this.targetPosition = [this.navmeshCentroid.x, this.navmeshCentroid.y, this.navmeshCentroid.z];
+            } else {
+                this.targetPosition = [0, 0, 0];
+            }
             this.mouseInput.lastWorldPos = [0, 0, 0];
             this.mouseInput.startOrbitPos = [0, 0, 0];
             this.focusTargetCube.position.copy(new THREE.Vector3().fromArray(this.mouseInput.lastWorldPos));

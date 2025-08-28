@@ -16,6 +16,14 @@ import { MotionStudyFollowable } from './MotionStudyFollowable.js';
 import { TouchControlButtons } from './TouchControlButtons.js';
 import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
 
+let uiManager; // import ui from '../../src/gui/UIManager.js'; <-- use this when we've fully migrated
+try {
+    // import the singleton UIManager to add elements to the viewport
+    uiManager = await import('../../src/gui/UIManager.js');
+} catch (_err) {
+    console.warn('[desktopCamera.js] UIManager.js not found, skipping import.');
+}
+
 /**
  * @fileOverview realityEditor.device.desktopCamera.js
  * Responsible for manipulating the camera position and resulting view matrix, on remote desktop clients
@@ -473,7 +481,11 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
             border.appendChild(textDiv);
         }
 
-        document.body.appendChild(border);
+        if (uiManager) {
+            uiManager.addToZone(uiManager.VIEWPORT, border);
+        } else {
+            document.body.appendChild(border);
+        }
     }
 
     /**
@@ -508,7 +520,11 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
 
         // add the buttons to the screen
         touchControlButtons = new TouchControlButtons();
-        document.body.appendChild(touchControlButtons.container);
+        if (uiManager) {
+            uiManager.addToZone(uiManager.VIEWPORT, touchControlButtons.container);
+        } else {
+            document.body.appendChild(touchControlButtons.container);
+        }
         touchControlButtons.container.id = 'touchControlsContainer';
 
         const FLAG_NAME = 'touchCameraControlButtons';
