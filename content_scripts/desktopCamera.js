@@ -19,7 +19,8 @@ import { CameraPositionMemoryBar } from './CameraPositionMemoryBar.js';
 let uiManager; // import ui from '../../src/gui/UIManager.js'; <-- use this when we've fully migrated
 try {
     // import the singleton UIManager to add elements to the viewport
-    uiManager = await import('../../src/gui/UIManager.js');
+    const uiManagerModule = (await import('../../src/gui/UIManager.js'));
+    uiManager = uiManagerModule.default;
 } catch (_err) {
     console.warn('[desktopCamera.js] UIManager.js not found, skipping import.');
 }

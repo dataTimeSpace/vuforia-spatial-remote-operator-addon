@@ -265,7 +265,7 @@ try {
                     worldIntersectPoint = (await realityEditor.spatialCursor.getRaycastCoordinates(event.pageX, event.pageY, true, realityEditor.device.environment.isARMode())).point;
                 }
 
-                if (worldIntersectPoint === undefined) return;
+                if (!worldIntersectPoint) return;
                 // record pointerdown world intersect point, for off-center camera rotation
                 this.mouseInput.lastWorldPos = [worldIntersectPoint.x, worldIntersectPoint.y, worldIntersectPoint.z];
                 if (this.focusTargetCube === null) {
