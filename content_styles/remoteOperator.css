@@ -118,6 +118,10 @@ body > * {
     background-color: rgba(64,170,29,0.9);
 }
 
+.mountableDropdown {
+    display: inline-block;
+}
+
 .hiddenDropdown {
     display: none;
 }

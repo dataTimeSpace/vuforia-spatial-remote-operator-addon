@@ -11,6 +11,7 @@ createNameSpace('realityEditor.gui.ar.desktopRenderer');
 import * as THREE from '../../thirdPartyCode/three/three.module.js';
 import {UNIFORMS, MAX_VIEW_FRUSTUMS} from '../../src/gui/ViewFrustum.js';
 import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
+import { store } from '../../src/store/index.js';
 
 /**
  * @fileOverview realityEditor.device.desktopRenderer.js
@@ -354,11 +355,6 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
                     obj.oldMaterial = tmp;
                 }
             });
-        });
-
-        realityEditor.gui.getMenuBar().addCallbackToItem(realityEditor.gui.ITEM.ToggleMotionStudySettings, () => {
-            if (!realityEditor.humanPose.draw) { return; }
-            realityEditor.humanPose.draw.toggleAnalyzerSettingsUI();
         });
 
         realityEditor.gui.buttons.registerCallbackForButton(
