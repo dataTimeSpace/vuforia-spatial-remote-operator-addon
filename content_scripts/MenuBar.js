@@ -75,6 +75,20 @@ createNameSpace('realityEditor.gui');
             menu.isDisabled = false;
             this.redraw();
         }
+        programmaticallyOpenMenu(menu) {
+            // if another menu is open, close it first
+            if (this.openMenu && this.openMenu !== menu) {
+                this.openMenu.closeDropdown();
+            }
+            this.openMenu = menu;
+            menu.openDropdown();
+        }
+        programmaticallyCloseMenu(menu) {
+            if (this.openMenu && this.openMenu === menu) {
+                this.openMenu.closeDropdown();
+                this.openMenu = null;
+            }
+        }
         onMenuTitleClicked(menu) {
             if (menu.isOpen) {
                 if (this.openMenu && this.openMenu !== menu) {
@@ -154,6 +168,42 @@ createNameSpace('realityEditor.gui');
                 }
             });
         }
+        // new method for components to add custom menus (e.g. Analytics Settings)
+        createMountableMenu({ displayName, menuTitleStyles = {}, menuDropdownStyles = {}, onCreate }) {
+            if (this.menus.find(menu => menu.name === displayName)) {
+                console.log('already contains this menu; skip');
+                return;
+            }
+
+            // Create a new Menu instance
+            const menu = new Menu(displayName);
+
+            // Track it just like the other menus
+            this.addMenu(menu);
+
+            // apply styles to the dropdown
+            let dropdown = menu.domElement.querySelector('.desktopMenuBarMenuDropdown');
+            if (dropdown && menuDropdownStyles) {
+                dropdown.classList.add('mountableDropdown'); // applies a different display mode
+                for (const [key, value] of Object.entries(menuDropdownStyles)) {
+                    dropdown.style.setProperty(key, value);
+                }
+            }
+
+            // apply styles to the title
+            let title = menu.domElement.querySelector('.desktopMenuBarMenuTitle');
+            if (title && menuTitleStyles) {
+                for (const [key, value] of Object.entries(menuTitleStyles)) {
+                    title.style.setProperty(key, value);
+                }
+            }
+
+            // Let caller populate its container
+            if (typeof onCreate === 'function') {
+                let dropdownContainer = menu.domElement.querySelector('.desktopMenuBarMenuDropdown');
+                onCreate(menu, dropdownContainer);
+            }
+        }
     }
 
     class Menu {
@@ -166,6 +216,10 @@ createNameSpace('realityEditor.gui');
             this.buildDom();
             this.menuIndex = 0;
             this.onMenuTitleClicked = null; // MenuBar can inject callback here to coordinate multiple menus
+            this.callbacks = {
+                onMenuOpened: [],
+                onMenuClosed: []
+            }
         }
         buildDom() {
             this.domElement = document.createElement('div');
@@ -185,10 +239,19 @@ createNameSpace('realityEditor.gui');
                 if (typeof this.onMenuTitleClicked === 'function') {
                     this.onMenuTitleClicked(this);
                 }
+                if (this.isOpen) {
+                    this.callbacks.onMenuOpened.forEach((cb) => cb());
+                } else {
+                    this.callbacks.onMenuClosed.forEach((cb) => cb());
+                }
             });
         }
         closeDropdown() {
             this.isOpen = false;
+            this.redraw();
+        }
+        openDropdown() {
+            this.isOpen = true;
             this.redraw();
         }
         addItem(menuItem) {

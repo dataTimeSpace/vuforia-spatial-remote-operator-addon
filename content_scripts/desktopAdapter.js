@@ -10,6 +10,14 @@
 
 createNameSpace('realityEditor.device.desktopAdapter');
 
+let uiManager; // import ui from '../../src/gui/UIManager.js'; <-- use this when we've fully migrated
+try {
+    // import the singleton UIManager to add elements to the viewport
+    const uiManagerModule = (await import('../../src/gui/UIManager.js'));
+    uiManager = uiManagerModule.default;
+} catch (_err) {
+    console.warn('[desktopCamera.js] UIManager.js not found, skipping import.');
+}
 /**
  * @fileOverview realityEditor.device.desktopAdapter.js
  * If the editor frontend is loaded on a desktop browser, re-maps some native functions, adjusts some CSS, and
@@ -274,6 +282,16 @@ createNameSpace('realityEditor.device.desktopAdapter');
             }
             return true;
         });
+
+        if (uiManager) {
+            // mainArea is the (viewport + inner-left + bottom)
+            let mainArea = uiManager.structure[uiManager.MAIN_AREA];
+            let viewport = uiManager.structure[uiManager.VIEWPORT];
+
+            // add some visual contrast between the viewport and the rest of the main area
+            if (mainArea) mainArea.style.backgroundColor = 'rgba(24, 25, 27)';
+            if (viewport) viewport.style.backgroundColor = 'rgb(50, 50, 50)';
+        }
     }
 
     /**
