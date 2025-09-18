@@ -284,7 +284,7 @@ try {
         });
 
         if (uiManager) {
-            // viewport + inner-left + bottom
+            // mainArea is the (viewport + inner-left + bottom)
             let mainArea = uiManager.structure[uiManager.MAIN_AREA];
             let viewport = uiManager.structure[uiManager.VIEWPORT];
 
