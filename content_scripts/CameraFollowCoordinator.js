@@ -287,7 +287,8 @@ export class CameraFollowCoordinator {
             return;
         }
 
-        const startDistance = 1000;
+        // Distance at which to start adjusting FoV
+        const startDistance = 500;
         if (this.followDistance > startDistance) {
             this.resetCameraFov();
         }
