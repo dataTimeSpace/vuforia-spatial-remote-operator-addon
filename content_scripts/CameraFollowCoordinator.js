@@ -57,6 +57,8 @@ export class CameraFollowCoordinator {
         this.currentFollowTarget = null;
         this.followDistance = 3000;
         this.currentFollowIndex = 0;
+        this.cameraFov = defaultCameraFov;
+        this.lastUpdate = Date.now();
 
         this.virtualCamera.onFirstPersonDistanceToggled((isFirstPerson, currentDistance) => {
             if (!this.currentFollowTarget) return;
@@ -107,8 +109,6 @@ export class CameraFollowCoordinator {
         this.currentFollowTarget = null;
         this.virtualCamera.stopFollowing();
         this.updateFollowMenu();
-
-        this.scheduleResetCameraFov();
     }
     followNext() {
         if (!this.currentFollowTarget) return;
@@ -149,8 +149,10 @@ export class CameraFollowCoordinator {
             }
         });
 
-        this.updateCameraFov();
+        this.updateCameraFov(Date.now() - this.lastUpdate);
+        this.lastUpdate = Date.now();
     }
+
     addMenuItems() {
         let menuBar = realityEditor.gui.getMenuBar();
         let numTargets = Object.keys(this.followTargets).length;
@@ -274,38 +276,45 @@ export class CameraFollowCoordinator {
         menuBar.addItemToMenu(realityEditor.gui.MENU.Follow, targetItem);
     }
 
-    updateCameraFov() {
+    updateCameraFov(dt) {
         const followable = this.currentFollowTarget?.followable;
         if (!followable) {
-            this.resetCameraFov();
+            this.resetCameraFov(dt);
             return;
         }
 
         const cameraFov = followable.getDesiredCameraFov();
         if (cameraFov < 0) {
-            this.resetCameraFov();
+            this.resetCameraFov(dt);
             return;
         }
 
         // Distance at which to start adjusting FoV
         const startDistance = 500;
         if (this.followDistance > startDistance) {
-            this.resetCameraFov();
+            this.resetCameraFov(dt);
         }
         const a = this.followDistance / startDistance;
         const interpolatedFov = a * defaultCameraFov + (1 - a) * cameraFov;
         this.setCameraFov(interpolatedFov);
     }
 
-    scheduleResetCameraFov() {
-        this.resetCameraFov();
-    }
-
-    resetCameraFov() {
-        this.setCameraFov(defaultCameraFov);
+    resetCameraFov(dt) {
+        let diff = this.cameraFov - defaultCameraFov;
+        if (Math.abs(diff) < 0.001) {
+            return;
+        }
+        let sign = diff > 0 ? -1 : 1;
+        let speed = dt * 0.3;
+        if (Math.abs(diff) < speed) {
+            this.setCameraFov(defaultCameraFov);
+            return;
+        }
+        this.setCameraFov(this.cameraFov + sign * speed);
     }
 
     setCameraFov(newFov) {
+        this.cameraFov = newFov;
         realityEditor.device.desktopAdapter.setCameraFov(newFov);
     }
 }
