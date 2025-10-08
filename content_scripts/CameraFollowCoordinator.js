@@ -32,6 +32,8 @@ const changeTargetButtons = [
     { name: 'Follow Previous Target', shortcutKey: 'LEFT',  dIndex: -1 }
 ];
 
+const defaultCameraFov = 41.22673; // approximate iPhone vertical fov https://discussions.apple.com/thread/250970597
+
 /**
  * Wraps a reference to a followable element in a class that we add/delete
  * without accidentally deleting the referenced class instance
@@ -96,6 +98,7 @@ export class CameraFollowCoordinator {
         this.virtualCamera.follow(this.currentFollowTarget.followable.sceneNode, this.followDistance);
         this.updateFollowMenu();
     }
+
     unfollow() {
         if (!this.currentFollowTarget) return;
 
@@ -104,6 +107,8 @@ export class CameraFollowCoordinator {
         this.currentFollowTarget = null;
         this.virtualCamera.stopFollowing();
         this.updateFollowMenu();
+
+        this.scheduleResetCameraFov();
     }
     followNext() {
         if (!this.currentFollowTarget) return;
@@ -143,6 +148,8 @@ export class CameraFollowCoordinator {
                 // console.warn('error in updateSceneNode for one of the followTargets')
             }
         });
+
+        this.updateCameraFov();
     }
     addMenuItems() {
         let menuBar = realityEditor.gui.getMenuBar();
@@ -265,5 +272,39 @@ export class CameraFollowCoordinator {
             this.follow(thisTarget.id, this.followDistance);
         });
         menuBar.addItemToMenu(realityEditor.gui.MENU.Follow, targetItem);
+    }
+
+    updateCameraFov() {
+        const followable = this.currentFollowTarget?.followable;
+        if (!followable) {
+            this.resetCameraFov();
+            return;
+        }
+
+        const cameraFov = followable.getDesiredCameraFov();
+        if (cameraFov < 0) {
+            this.resetCameraFov();
+            return;
+        }
+
+        const startDistance = 1000;
+        if (this.followDistance > startDistance) {
+            this.resetCameraFov();
+        }
+        const a = this.followDistance / startDistance;
+        const interpolatedFov = a * defaultCameraFov + (1 - a) * cameraFov;
+        this.setCameraFov(interpolatedFov);
+    }
+
+    scheduleResetCameraFov() {
+        this.resetCameraFov();
+    }
+
+    resetCameraFov() {
+        this.setCameraFov(defaultCameraFov);
+    }
+
+    setCameraFov(newFov) {
+        realityEditor.device.desktopAdapter.setCameraFov(newFov);
     }
 }
