@@ -35,6 +35,10 @@ try {
 
     let env = realityEditor.device.environment.variables;
 
+    let cameraFov = 41.22673; // approximate iPhone vertical fov https://discussions.apple.com/thread/250970597
+    let viewportWidth = window.innerWidth;
+    let viewportHeight = window.innerHeight;
+
     /**
      * initialize the desktop adapter only if we are running on a desktop environment
      */
@@ -103,7 +107,8 @@ try {
             addSocketListeners(); // HACK. this needs to happen after realtime module finishes loading
         }, 100);
 
-        calculateProjectionMatrices(window.innerWidth, window.innerHeight);
+        setViewportBounds(window.innerWidth, window.innerHeight);
+        calculateProjectionMatrices();
 
         function setupKeyboardWhenReady() {
             if (realityEditor.device.KeyboardListener) {
@@ -120,9 +125,13 @@ try {
         }, 100);
     }
 
-    function calculateProjectionMatrices(viewportWidth, viewportHeight) {
-        const iPhoneVerticalFOV = 41.22673; // https://discussions.apple.com/thread/250970597
-        const desktopProjectionMatrix = projectionMatrixFrom(iPhoneVerticalFOV, viewportWidth / viewportHeight, 10, 300000);
+    function setViewportBounds(width, height) {
+        viewportWidth = width;
+        viewportHeight = height;
+    }
+
+    function calculateProjectionMatrices() {
+        const desktopProjectionMatrix = projectionMatrixFrom(cameraFov, viewportWidth / viewportHeight, 10, 300000);
 
         realityEditor.gui.ar.setProjectionMatrix(desktopProjectionMatrix);
 
@@ -131,6 +140,13 @@ try {
             cameraNode.needsRerender = true; // make sure the sceneGraph is rendered with the right projection matrix
         }
     }
+
+    exports.setCameraFov = function setCameraFov(fov) {
+        if (fov !== cameraFov) {
+            cameraFov = fov;
+            calculateProjectionMatrices();
+        }
+    };
 
     function setupMenuBarItems() {
         const menuBar = realityEditor.gui.getMenuBar();
@@ -263,7 +279,8 @@ try {
 
         let onResizeListener = realityEditor.device.layout.onViewportResized ?? realityEditor.device.layout.onWindowResized;
         onResizeListener(({width, height}) => {
-            calculateProjectionMatrices(width, height);
+            setViewportBounds(width, height);
+            calculateProjectionMatrices();
         });
 
         const DISABLE_SAFE_MODE = true;
@@ -440,7 +457,8 @@ try {
         // start the update loop when the remote operator is shown
         realityEditor.device.modeTransition.onRemoteOperatorShown(() => {
             realityEditor.gui.threejsScene.getInternals().setAnimationLoop(update); // start update loop
-            calculateProjectionMatrices(window.innerWidth, window.innerHeight); // update proj matrices
+            setViewportBounds(window.innerWidth, window.innerHeight);
+            calculateProjectionMatrices(); // update proj matrices
         });
     }
 
