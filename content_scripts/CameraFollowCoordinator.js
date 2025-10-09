@@ -45,6 +45,9 @@ class CameraFollowTarget {
         this.displayName = this.followable.displayName;
     }
 }
+function easeInOutSine(x) {
+    return -(Math.cos(Math.PI * x) - 1) / 2;
+}
 
 /**
  * Adding CameraFollowTargets to a CameraFollowCoordinator allows it to control
@@ -58,7 +61,7 @@ export class CameraFollowCoordinator {
         this.followDistance = 3000;
         this.currentFollowIndex = 0;
         this.cameraFov = defaultCameraFov;
-        this.lastUpdate = Date.now();
+        this.resetCameraFovAnimation = null;
 
         this.virtualCamera.onFirstPersonDistanceToggled((isFirstPerson, currentDistance) => {
             if (!this.currentFollowTarget) return;
@@ -149,8 +152,7 @@ export class CameraFollowCoordinator {
             }
         });
 
-        this.updateCameraFov(Date.now() - this.lastUpdate);
-        this.lastUpdate = Date.now();
+        this.updateCameraFov();
     }
 
     addMenuItems() {
@@ -276,41 +278,60 @@ export class CameraFollowCoordinator {
         menuBar.addItemToMenu(realityEditor.gui.MENU.Follow, targetItem);
     }
 
-    updateCameraFov(dt) {
+    updateCameraFov() {
         const followable = this.currentFollowTarget?.followable;
+        window.followable = followable;
         if (!followable) {
-            this.resetCameraFov(dt);
+            this.resetCameraFov();
             return;
         }
 
         const cameraFov = followable.getDesiredCameraFov();
         if (cameraFov < 0) {
-            this.resetCameraFov(dt);
+            this.resetCameraFov();
             return;
         }
 
         // Distance at which to start adjusting FoV
         const startDistance = 500;
         if (this.followDistance > startDistance) {
-            this.resetCameraFov(dt);
+            this.resetCameraFov();
         }
         const a = this.followDistance / startDistance;
         const interpolatedFov = a * defaultCameraFov + (1 - a) * cameraFov;
         this.setCameraFov(interpolatedFov);
     }
 
-    resetCameraFov(dt) {
+    resetCameraFov() {
         let diff = this.cameraFov - defaultCameraFov;
         if (Math.abs(diff) < 0.001) {
+            this.resetCameraFovAnimation = null;
             return;
         }
-        let sign = diff > 0 ? -1 : 1;
-        let speed = dt * 0.3;
-        if (Math.abs(diff) < speed) {
+        if (!this.resetCameraFovAnimation) {
+            this.resetCameraFovAnimation = {
+                start: this.cameraFov,
+                end: defaultCameraFov,
+                startTime: Date.now(),
+            };
+        }
+        let progress = (Date.now() - this.resetCameraFovAnimation.startTime) / 300;
+        if (progress > 1) {
+            this.virtualCamera.updateParametricTargetAndPosition(1);
             this.setCameraFov(defaultCameraFov);
+            this.resetCameraFovAnimation = null;
             return;
         }
-        this.setCameraFov(this.cameraFov + sign * speed);
+
+        if (progress < 0.1) {
+            return;
+        }
+        progress = (progress - 0.1) / 0.9;
+        const easedProgress = easeInOutSine(progress);
+
+        let {start, end} = this.resetCameraFovAnimation;
+        let transitionFov = (1 - easedProgress) * start + easedProgress * end;
+        this.setCameraFov(transitionFov);
     }
 
     setCameraFov(newFov) {
