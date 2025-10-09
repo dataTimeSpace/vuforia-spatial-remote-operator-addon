@@ -323,10 +323,6 @@ export class CameraFollowCoordinator {
             return;
         }
 
-        if (progress < 0.1) {
-            return;
-        }
-        progress = (progress - 0.1) / 0.9;
         const easedProgress = easeInOutSine(progress);
 
         let {start, end} = this.resetCameraFovAnimation;
