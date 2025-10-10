@@ -201,7 +201,7 @@ import Splatting from '../../src/splatting/Splatting.js';
         const focusCamera = new MenuItem(ITEM.FocusCamera, { shortcutKey: 'G' }, null);
         menuBar.addItemToMenu(MENU.Camera, focusCamera);
 
-        const rzvAdvanceCameraShader = new MenuItem(ITEM.AdvanceCameraShader, { disabled: true }, null);
+        const rzvAdvanceCameraShader = new MenuItem(ITEM.AdvanceCameraShader, { }, null);
         menuBar.addItemToMenu(MENU.Camera, rzvAdvanceCameraShader);
 
         const toggleMotionStudySettings = new MenuItem(ITEM.ToggleMotionStudySettings, { toggle: true, defaultVal: false }, null);
