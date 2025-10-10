@@ -28,6 +28,7 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
             this.visible = true;
             this.spaghettiVisible = false;
             this.currentShaderModeIndex = 0;
+            this.shaderMode = enabledShaderModes[this.currentShaderModeIndex];
             this.floorOffset = floorOffset;
             this.depthCanvasCache = {};
             this.colorCanvasCache = {};
@@ -36,6 +37,13 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
                 onCameraVisCreated: [],
                 onCameraVisRemoved: [],
             };
+            this.videoPlayers = [];
+            realityEditor.gui.ar.videoPlayback.onVideoCreated((videoPlayer) => {
+                this.videoPlayers.push(videoPlayer);
+            });
+            realityEditor.gui.ar.videoPlayback.onVideoDisposed((videoPlayer) => {
+                this.videoPlayers = this.videoPlayers.filter(player => player !== videoPlayer);
+            });
 
             this.onAnimationFrame = this.onAnimationFrame.bind(this);
             window.requestAnimationFrame(this.onAnimationFrame);
@@ -415,8 +423,6 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
             realityEditor.gui.getMenuBar().setItemEnabled(realityEditor.gui.ITEM.PointClouds, true);
             realityEditor.gui.getMenuBar().setItemEnabled(realityEditor.gui.ITEM.SpaghettiMap, true);
 
-            realityEditor.gui.getMenuBar().setItemEnabled(realityEditor.gui.ITEM.AdvanceCameraShader, true);
-
             realityEditor.gui.getMenuBar().setItemEnabled(realityEditor.gui.ITEM.TakeSpatialSnapshot, true);
 
             this.callbacks.onCameraVisCreated.forEach(cb => {
@@ -450,8 +456,13 @@ import {ShaderMode} from '../../src/spatialCapture/Shaders.js';
         }
 
         setShaderMode(shaderMode) {
+            this.shaderMode = shaderMode;
             for (let camera of Object.values(this.cameras)) {
                 camera.setShaderMode(shaderMode);
+            }
+
+            for (let videoPlayer of this.videoPlayers) {
+                videoPlayer.setShaderMode(shaderMode);
             }
         }
     };
