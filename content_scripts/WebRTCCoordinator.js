@@ -9,6 +9,7 @@ import { iceServers } from './config.js';
     // Coordinator re-sends joinNetwork message at this interval of ms until
     // discoverPeers acknowledgement is received from remote peer
     const JOIN_NETWORK_INTERVAL = 5000;
+    const ENABLE_MICROPHONE = false;
 
     const decoder = new TextDecoder();
 
@@ -61,21 +62,25 @@ import { iceServers } from './config.js';
             joinNetwork();
             this.joinNetworkInterval = setInterval(joinNetwork, JOIN_NETWORK_INTERVAL);
 
-            this.audioStreamPromise = navigator.mediaDevices.getUserMedia({
-                video: false,
-                audio: {
-                    noiseSuppression: true,
-                },
-            }).then((stream) => {
-                this.audioStream = this.improveAudioStream(stream);
-                for (let conn of Object.values(this.webrtcConnections)) {
-                    conn.audioStream = this.audioStream;
-                    conn.localConnection.addStream(conn.audioStream);
-                }
-                this.updateMutedState();
-            }).catch(err => {
-                showError(ErrorMessage.noMicrophonePermissions, err, 'audioErrorUI', 'audioErrorText', 10000);
-            });
+            if (ENABLE_MICROPHONE) {
+                this.audioStreamPromise = navigator.mediaDevices.getUserMedia({
+                    video: false,
+                    audio: {
+                        noiseSuppression: true,
+                    },
+                }).then((stream) => {
+                    this.audioStream = this.improveAudioStream(stream);
+                    for (let conn of Object.values(this.webrtcConnections)) {
+                        conn.audioStream = this.audioStream;
+                        conn.localConnection.addStream(conn.audioStream);
+                    }
+                    this.updateMutedState();
+                }).catch(err => {
+                    showError(ErrorMessage.noMicrophonePermissions, err, 'audioErrorUI', 'audioErrorText', 10000);
+                });
+            } else {
+                this.audioStreamPromise = Promise.resolve(null);
+            }
         }
 
         sendSignallingMessage(message) {
