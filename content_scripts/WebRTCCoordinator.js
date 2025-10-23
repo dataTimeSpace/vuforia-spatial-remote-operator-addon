@@ -351,7 +351,7 @@ import { iceServers } from './config.js';
                     clearInterval(autoplayWhenAvailableInterval);
                     elt.removeEventListener('play', clearAutoplayInterval);
                 });
-                document.body.appendChild(elt);
+                // document.body.appendChild(elt);
             });
 
             this.receiveChannel = this.localConnection.createDataChannel(
