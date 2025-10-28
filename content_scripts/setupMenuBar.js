@@ -183,8 +183,8 @@ import Splatting from '../../src/splatting/Splatting.js';
         const toggleViewCones = new MenuItem(ITEM.ViewCones, { shortcutKey: 'K', toggle: true, defaultVal: false }, null);
         menuBar.addItemToMenu(MENU.View, toggleViewCones);
 
-        const toggleCutoutViewFrustums = new MenuItem(ITEM.CutoutViewFrustums, { toggle: true, defaultVal: false }, null);
-        menuBar.addItemToMenu(MENU.View, toggleCutoutViewFrustums);
+        // const toggleCutoutViewFrustums = new MenuItem(ITEM.CutoutViewFrustums, { toggle: true, defaultVal: false }, null);
+        // menuBar.addItemToMenu(MENU.View, toggleCutoutViewFrustums);
 
         // Note: these features still exist in the codebase, but have been removed from the menu for now
         // const toggleSurfaceAnchors = new MenuItem(ITEM.SurfaceAnchors, { shortcutKey: 'SEMICOLON', toggle: true, defaultVal: false }, null); // other module can attach a callback later
@@ -192,8 +192,8 @@ import Splatting from '../../src/splatting/Splatting.js';
         // const toggleVideoPlayback = new MenuItem(ITEM.VideoPlayback, { shortcutKey: 'OPEN_BRACKET', toggle: true, defaultVal: false }, null); // other module can attach a callback later
         // menuBar.addItemToMenu(MENU.View, toggleVideoPlayback);
 
-        const toggleDarkMode = new MenuItem(ITEM.DarkMode, { toggle: true, defaultVal: true }, null);
-        menuBar.addItemToMenu(MENU.View, toggleDarkMode);
+        // const toggleDarkMode = new MenuItem(ITEM.DarkMode, { toggle: true, defaultVal: true }, null);
+        // menuBar.addItemToMenu(MENU.View, toggleDarkMode);
 
         const toggleFlyMode = new MenuItem(ITEM.ToggleFlyMode, { toggle: true, shortcutKey: 'F', defaultVal: false }, null);
         menuBar.addItemToMenu(MENU.Camera, toggleFlyMode);
