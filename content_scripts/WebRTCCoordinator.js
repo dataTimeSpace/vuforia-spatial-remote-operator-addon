@@ -320,6 +320,8 @@ import { iceServers } from './config.js';
                     return;
                 }
                 const elt = document.createElement('video');
+                elt.style.pointerEvents = 'none';
+                elt.style.opacity = 0;
                 // elt.style.position = 'absolute';
                 // elt.style.top = 0;
                 // elt.style.left = 0;
@@ -351,7 +353,7 @@ import { iceServers } from './config.js';
                     clearInterval(autoplayWhenAvailableInterval);
                     elt.removeEventListener('play', clearAutoplayInterval);
                 });
-                // document.body.appendChild(elt);
+                document.body.appendChild(elt);
             });
 
             this.receiveChannel = this.localConnection.createDataChannel(
