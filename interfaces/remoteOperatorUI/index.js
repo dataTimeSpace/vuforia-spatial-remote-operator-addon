@@ -62,13 +62,6 @@ if (exports.enabled) {
             console.error('Failed to start Remote Operator: ', e);
         }
     }
-
-    try {
-        const rzvServer = require('./server.js');
-        rzvServer.start();
-    } catch (e) {
-        console.error('Unable to start Reality Zone Viewer video/skeleton server', e);
-    }
 }
 
 function startHTTPServer(localUIApp, port) {
