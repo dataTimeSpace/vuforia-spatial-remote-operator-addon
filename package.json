@@ -22,8 +22,8 @@
     "toolsocket": "github:dataTimeSpace/toolsocket"
   },
   "devDependencies": {
-    "eslint": "^9.31.0",
-    "globals": "^16.3.0",
+    "eslint": "^9.39.2",
+    "globals": "^17.0.0",
     "webrtc-adapter": "^9.0.3"
   }
 }
