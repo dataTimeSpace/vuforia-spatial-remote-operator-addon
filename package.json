@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/dataTimeSpace/vuforia-spatial-remote-operator-addon#readme",
   "dependencies": {
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "express": "^4.21.2",
     "toolsocket": "github:dataTimeSpace/toolsocket"
   },
